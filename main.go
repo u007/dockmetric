@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 
@@ -46,9 +47,12 @@ func main() {
 		}(container)
 	}
 
-	c := make(chan os.Signal, 1)
+	// c := make(chan os.Signal, 1)
 	//signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	<-c
+	// <-c
+	for {
+		time.Sleep(2 * time.Second)
+	}
 
 	// fmt.Printf("Installed %s@%s\n", repo+subPath, version)
 }
