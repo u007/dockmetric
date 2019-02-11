@@ -1,0 +1,43 @@
+version: "3.2"
+services:
+  influx:
+    image: influxdb
+    volumes:
+      - "./influxdb:/var/lib/influxdb"
+      - "./influxdb-meta.conf:/etc/influxdb/influxdb-meta.conf"
+    ports:
+      - 8086:8086
+      - 8083:8083
+    environment:
+      - INFLUXDB_ADMIN_ENABLED=true
+      - INFLUXDB_DB=report
+      - INFLUXDB_ADMIN_USER=myadmin
+      - INFLUXDB_ADMIN_PASSWORD=exampleadminpassword!
+      - INFLUXDB_USER=dbu1
+      - INFLUXDB_USER_PASSWORD=
+  grafana:
+    build: grafana
+    # image: grafana/grafana
+    environment:
+      - INFLUX_URL=influx:8086
+      - INFLUX_PASS=
+      - GRAFANA_PASS=
+      - CONTAINERS=dockercontainer1,dockercontainer2
+    ports:
+      - 3016:3000
+    volumes:
+      - "./grafana/data:/var/lib/grafana"
+      - "./grafana/custom:/custom"
+    depends_on:
+      - influx
+  metrics:
+    # this runs the stats and save into influx
+    build: metrics
+    environment:
+      - INFLUX_URL=influx:8086
+      - INFLUX_PASS=
+      - CONTAINERS=dockercontainer1,dockercontainer2
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    depends_on:
+      - influx
